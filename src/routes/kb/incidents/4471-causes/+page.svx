@@ -1,0 +1,36 @@
+---
+layout: runbook
+title: '#4471 · two date causes'
+owner: support desk
+status: closed
+reviewed: 2026-10-29
+signature: AdrianQuuu
+---
+
+<script>
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+Ticket #4471 combines **412 unique reports** into one known issue. The export contains 427 rows, including 15 repeated report IDs. Counting each report once and classifying it by tenant locale, booking form, and channel reveals two different causes. The intake tag is only a guess and does not reliably identify either cause.
+
+## Issue split
+
+| Cause | Reports | Problem |
+| --- | ---: | --- |
+| `parser` | 379 | The shared date parser assumes month-first input, so dates from day-first tenants can be flipped. |
+| `hint` | 33 | The booking-v3 form displays an `MM/DD/YYYY` hint to day-first tenants, but interprets the submitted value in the tenant's day-first order. |
+
+These counts total 412. They are separate issues because the shared parser and the booking-v3 hint/form behavior are distinct causes.
+
+## Classification notes
+
+The export's `causes.ts` assigns causes using tenant locale, booking form, and report channel. It first removes duplicate report IDs, then counts only reports merged into #4471. It does not classify by the intake tag: 23 `parser` reports were tagged `hint`, while 15 `hint` reports were tagged `parser`.
+
+The five reports marked as one-day moves in `desk-notes.json` remain in the `parser` group under this rule. They are a symptom note, not a third cause. The export covers reports received from 1 April through 4 October 2026.
+
+## Engineering update · 5 October 2026
+
+- `parser` — **FIXED**: `fix(dates): parse dd/mm for eu locales`.
+- `hint` — **WON'T FIX**: the booking-v3 form was retired.
+
+<RenderStamp {signature} />

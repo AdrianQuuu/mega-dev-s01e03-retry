@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Aggregate cause breakdown for support ticket 4471">
+    <title>#4471 · two date causes</title>
+    <style>
+      :root { color-scheme: light dark; font: 16px/1.6 system-ui, sans-serif; }
+      body { max-width: 860px; margin: 3rem auto; padding: 0 1.25rem; }
+      h1, h2 { line-height: 1.2; }
+      table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; }
+      th, td { text-align: left; vertical-align: top; border-bottom: 1px solid #8888; padding: .7rem; }
+      th:nth-child(2), td:nth-child(2) { text-align: right; white-space: nowrap; }
+      code { font-family: ui-monospace, monospace; }
+      .stamp { margin-top: 3rem; color: #777; font: .9rem ui-monospace, monospace; }
+      .stamp b { letter-spacing: .04em; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>#4471 · two date causes</h1>
+      <p><strong>Status:</strong> closed · <strong>Owner:</strong> support desk · <strong>Reviewed:</strong> 2026-10-29</p>
+
+      <p>Ticket #4471 combines <strong>412 unique reports</strong> into one known issue. The export contains 427 rows, including 15 repeated report IDs. Counting each report once and classifying it by tenant locale, booking form, and channel reveals two different causes. The intake tag is only a guess and does not reliably identify either cause.</p>
+
+      <h2>Issue split</h2>
+      <table>
+        <thead><tr><th>Cause</th><th>Reports</th><th>Problem</th></tr></thead>
+        <tbody>
+          <tr><td><code>parser</code></td><td>379</td><td>The shared date parser assumes month-first input, so dates from day-first tenants can be flipped.</td></tr>
+          <tr><td><code>hint</code></td><td>33</td><td>The booking-v3 form displays an <code>MM/DD/YYYY</code> hint to day-first tenants, but interprets the submitted value in the tenant's day-first order.</td></tr>
+        </tbody>
+      </table>
+      <p>These counts total 412. They are separate issues because the shared parser and the booking-v3 hint/form behavior are distinct causes.</p>
+
+      <h2>Classification notes</h2>
+      <p>The export's <code>causes.ts</code> assigns causes using tenant locale, booking form, and report channel. It first removes duplicate report IDs, then counts only reports merged into #4471. It does not classify by the intake tag: 23 <code>parser</code> reports were tagged <code>hint</code>, while 15 <code>hint</code> reports were tagged <code>parser</code>.</p>
+      <p>The five reports marked as one-day moves in <code>desk-notes.json</code> remain in the <code>parser</code> group under this rule. They are a symptom note, not a third cause. The export covers reports received from 1 April through 4 October 2026.</p>
+
+      <h2>Engineering update · 5 October 2026</h2>
+      <ul>
+        <li><code>parser</code> — <strong>FIXED</strong>: <code>fix(dates): parse dd/mm for eu locales</code>.</li>
+        <li><code>hint</code> — <strong>WON'T FIX</strong>: the booking-v3 form was retired.</li>
+      </ul>
+
+      <p class="stamp">desk ref <b>DR-DEEA-AZQA</b> · AdrianQuuu</p>
+    </main>
+  </body>
+</html>
